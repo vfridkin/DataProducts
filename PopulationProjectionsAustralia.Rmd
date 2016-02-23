@@ -1,0 +1,74 @@
+---
+title: "10 year population projections - Australia "
+author: "Vlad Fridkin"
+date: "February 22, 2016"
+output: html_document
+---
+
+### Source notes
+
+Australian Bureau of Statistics: Population Projections, Australia, 2012-2101.  
+<http://stat.abs.gov.au/Index.aspx?DatasetCode=POP_PROJ_2011#>
+
+
+*The base population used to calculate projections is the Estimated Resident Population (ERP) as determined in Australian Demographic Statistics March Quarter 2013 (cat. no. 3101.0).*
+
+*This publication contains projections of Australia's population by age and sex for the period 2013 to 2101, and projections of the states, territories and capital cities/balances of state for the period 2013 to 2061. Capital city/balance of state projections were not generated for the Australian Capital Territory because under the new Australian Statistical Geography Standard, the Australian Capital Territory is not broken down into capital city/balance of state regions.*
+
+### Libraries
+
+```{r}
+library(openxlsx) # for importing from Excel
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+setwd("~/Private_BackedUp/Coursera/DataScience/DataProducts/Assignment/data") # deleteMe
+```
+
+### Import data
+
+```{r}
+abs <- read.xlsx("abs.xlsx", sheet = "reformatted") # data.frame
+```
+
+### Create tidy data set
+
+Before removing summary rows that are not numeric,  convert rows with Age = "100 and over" to "100".  This means "100" will represent "100+".
+
+```{r}
+abs$Age[abs$Age == "100 and over"] <- "100"
+abs$Age <- as.numeric(abs$Age)
+abs <- abs[!is.na(abs$Age),]
+```
+
+```{r}
+abs %>% 
+  filter(
+    Fertility.Assumption == "High fertility", 
+    Mortality.Assumption == "High life expectancy"
+    ) %>% 
+  ggplot() + 
+  geom_point(aes(y = Males, x = Age, color = Time)) +
+  scale_x_continuous(breaks = seq(0, 100, 10)) +
+  scale_y_continuous(labels = comma) +
+  facet_wrap(~ Net.Overseas.Migration)
+
+# Net.Overseas.Migration == "High NOM"
+
+abs4 %>% 
+  filter(
+    Time == 2022,
+    Fertility.Assumption == "High fertility", 
+    Mortality.Assumption == "High life expectancy"
+    ) %>% 
+  ggplot() + 
+  geom_point(aes(y = CountDelta, x = Age, col = Gender)) +
+  geom_hline(yintercept = 0) +
+  scale_x_continuous(breaks = seq(0, 100, 10)) +
+  scale_y_continuous(labels = comma) +
+  facet_wrap(~ Net.Overseas.Migration)
+
+
+```
+
+
