@@ -59,12 +59,12 @@ abs <- abs %>%
 Changes between 2012-22
 ========================================================
 Increases in the 70-80 age group are consistent with an aging population. 
-Interestingly the 30-40 age group grows even more.  This is due to
-to immigration as demonstrated [here]
-(https://vfridkin.shinyapps.io/AusPop/).
-
+Interestingly the 30-40 age group grows even more.  This can be shown to be due to
+to immigration.
 
 ```{r, echo=FALSE, fig.width=8, fig.height=6, fig.align="center"}
+# as demonstrated [here]
+# (https://vfridkin.shinyapps.io/AusPop/).
 absBaseYear <- abs %>% filter(Time == "2012") %>% rename(countBase = count)
 absBaseYear$Time <- NULL
 abs <- left_join(abs, absBaseYear)

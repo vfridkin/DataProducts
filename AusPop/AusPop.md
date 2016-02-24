@@ -22,10 +22,8 @@ people numbers increase disproportionately across the distribution of ages.
 Changes between 2012-22
 ========================================================
 Increases in the 70-80 age group are consistent with an aging population. 
-Interestingly the 30-40 age group grows even more.  This is due to
-to immigration as demonstrated [here]
-(https://vfridkin.shinyapps.io/AusPop/).
-
+Interestingly the 30-40 age group grows even more.  This can be shown to be due to
+to immigration.
 
 <img src="AusPop-figure/unnamed-chunk-2-1.png" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;" />
 
