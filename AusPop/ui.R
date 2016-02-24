@@ -33,17 +33,17 @@ shinyUI(fluidPage(
                   label = NULL,
                   choices = c("High Net Overseas Migration", "Medium Net Overseas Migration", "Low Net Overseas Migration", "Zero Net Overseas Migration"),
                   selected = "Medium Net Overseas Migration"),
-      checkboxInput(inputId = "genderSplit",
-                    label = "Show by gender",
-                    value = FALSE)
+      radioButtons("gender", choices = list("female" = 1, "male" = 2, "both" = 3),
+                    label = h4("Gender"),
+                    selected = 3)
     ),
     
     mainPanel(
       tabsetPanel(type = "tabs", 
-                  tabPanel("Totals", plotOutput("totals")) 
-                  #tabPanel("Absolute change", verbatimTextOutput("absChange")), 
-                  #tabPanel("Relative change", tableOutput("relChange"))
+                  tabPanel("Totals by age", plotOutput("totals")),
+                  tabPanel("Absolute change", plotOutput("absChange")), 
+                  tabPanel("Relative change", plotOutput("relChange"))
+      )
     )
   )
-
 ))
