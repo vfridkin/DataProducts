@@ -1,0 +1,93 @@
+Australian population projections
+========================================================
+author: Vlad Fridkin
+date: Feb 2016
+
+Why is this interesting?
+========================================================
+It's common knowledge in Australia that the proportion of elderly people is increasing.
+Instead of reading it in the news or hearing it from other people, it is good to explore
+the underlying data to confirm if this is true, and also to
+- obtain the actual numbers
+- understand the assumptions 
+- discover other effects on population
+
+Totals by age
+========================================================
+Assuming **medium** fertility, life expectancy and net overseas migration,
+people numbers increase disproportionately across the distribution of ages.
+
+```{r, echo = FALSE, fig.width=8, fig.height=6, fig.align="center"}
+library(ggplot2)
+library(openxlsx)
+library(dplyr)
+library(tidyr)
+library(scales)
+
+# Read data.frame from XL worksheet
+abs <- read.xlsx("data/abs.xlsx", sheet = "reformatted")
+
+# Non-numeric rows are summary of existing data, except for age>100
+abs$Age[abs$Age == "100 and over"] <- "100" # 100 now represents >100
+
+# Convert Age to numeric and remove non-numeric rows to remove duplicate summary data
+abs$Age <- as.numeric(abs$Age)
+abs <- abs[!is.na(abs$Age),]
+
+# Combine gender counts into a single count column
+abs <- abs %>% 
+    filter(
+         Fertility.Assumption == "Medium fertility", 
+         Mortality.Assumption == "Medium life expectancy",
+         Net.Overseas.Migration == "Medium NOM", 
+         Time == 2012 | Time == 2022
+    ) %>%
+    gather("gender", "count", Males, Females) %>%
+    select(-gender) %>% group_by(Time, Age) %>% summarise(count = sum(count))
+
+# Plot data for medium assumptions
+ abs1 <- abs %>% 
+     ggplot() +
+         labs(y = "Number of people") +
+         geom_point(aes(y = count, x = Age, color = Time)) +
+         scale_x_continuous(breaks = seq(0, 100, 10)) +
+         scale_y_continuous(labels = comma) +
+     theme_minimal() 
+ print(abs1)
+```
+
+Changes between 2012-22
+========================================================
+Increases in the 70-80 age group are consistent with an aging population. 
+Interestingly the 30-40 age group grows even more.  This is due to
+to immigration as demonstrated [here]
+(https://vfridkin.shinyapps.io/AusPop/).
+
+
+```{r, echo=FALSE, fig.width=8, fig.height=6, fig.align="center"}
+absBaseYear <- abs %>% filter(Time == "2012") %>% rename(countBase = count)
+absBaseYear$Time <- NULL
+abs <- left_join(abs, absBaseYear)
+abs$delta <- abs$count - abs$countBase
+
+# Plot data for changes
+abs2 <- abs %>% 
+      ggplot() + 
+      labs(y = I(paste("Change in number of people relative to 2012"))) +
+      geom_point(aes(y = delta, x = Age, color = Time)) +
+      scale_x_continuous(breaks = seq(0, 100, 10)) +
+      scale_y_continuous(labels = comma) +
+      theme_minimal() 
+print(abs2)
+```
+
+
+Source of population projection data
+========================================================
+Data was sourced from the **Australian Bureau of Statistics** 
+
+The data can be downloaded from 
+[Population Projections, Australia, 2012-2101]
+(http://stat.abs.gov.au/Index.aspx?DatasetCode=POP_PROJ_2011)
+
+The data set is too big to download at once, so only 11 years of data (2012-2022) was extracted, lightly formatted with Excel (such as removal of descriptions and filling in of empty factor cells) and data wrangled with R.
